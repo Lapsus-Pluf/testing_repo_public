@@ -24,7 +24,7 @@ jobs:
         name: Check for changes in python-pytest_example directory
         run: |
           echo "Checking for changes in python-pytest_example/ directory..."
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^python-pytest_example/'; then
+          if git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^python-pytest_example/'; then
             echo "run_tests=true" >> $GITHUB_OUTPUT
             echo "Changes detected in python-pytest_example/ directory."
           else
