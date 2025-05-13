@@ -13,12 +13,13 @@ jobs:
   # JOB to run change detection
   check-folder-changes:
     outputs:
-      python-pytest_example: ${{ steps.filter.outputs.python-pytest_example }}
+      python-pytest_example: ${{ steps.changes.outputs.python-pytest_example }}
     permissions:
       pull-requests: read
     runs-on: ubuntu-latest
     steps:
-      - id: filter
+      - id: changes
+        name: Check for changes in the 'python-pytest_example' folder
         uses: dorny/paths-filter@v3
         with:
           filters: |
