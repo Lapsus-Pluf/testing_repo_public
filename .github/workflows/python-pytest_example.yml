@@ -1,38 +1,69 @@
-# This workflow will install Python dependencies and run tests with a variety of Python versions
+# This workflow will be triggered on every push and pull request to the `main` branch.
+#   But it will only install Python dependencies and run Pytest tests (using a variety of Python versions)
+#   if modifications are made to the `python-pytest_example` directory.
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Execute Python (Pytest) tests
+name: Conditional Python (Pytest) tests execution
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  run-tests:
+  # JOB to run change detection
+  check-folder-changes:
+    outputs:
+      python-pytest_example: ${{ steps.changes.outputs.python-pytest_example }}
+    permissions:
+      pull-requests: read
     runs-on: ubuntu-latest
+    steps:
+      - id: changes
+        name: Check for changes in the 'python-pytest_example' folder
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            python-pytest_example:
+              - 'python-pytest_example/**'
 
+  # JOB to tests execution
+  run-tests:
+    if: ${{ needs.check-folder-changes.outputs.python-pytest_example == 'true' }}
+    needs: check-folder-changes
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          cache: 'pip'
+          cache: "pip"
           python-version: ${{ matrix.python-version }}
-
       - name: Install/Upgrade Python package managers
         run: python -m pip install --upgrade pip setuptools wheel
-
       - name: Install dependencies
         run: python -m pip install -r python-pytest_example/requirements.txt
-
       - name: Execute the Pytest tests
         run: python -m pytest python-pytest_example -v
+
+  # JOB to check the results of the tests and decide the final result of the workflow
+  check-test-results:
+    if: always()
+    needs: [check-folder-changes, run-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide final result
+        run: |
+          if [ "${{ needs.check-folder-changes.outputs.python-pytest_example }}" = "false" ]; then
+            echo "Tests were not required. Skipping final result check."
+            exit 0
+          fi
+          if [ "${{ needs.run-tests.result }}" != "success" ]; then
+            echo "Some tests failed."
+            exit 1
+          fi
+          echo "All tests passed."
