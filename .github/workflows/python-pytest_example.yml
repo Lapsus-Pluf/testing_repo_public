@@ -10,73 +10,54 @@ on:
     branches: [ "main" ]
 
 jobs:
+  # JOB to run change detection
   check-folder-changes:
     outputs:
-      run_tests: ${{ steps.check_changes.outputs.run_tests }}
-
+      python-pytest_example: ${{ steps.filter.outputs.python-pytest_example }}
+    permissions:
+      pull-requests: read
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            python-pytest_example:
+              - 'python-pytest_example/**'
 
-      - id: check_changes
-        name: Check for changes in python-pytest_example directory
-        run: |
-          echo "Checking for changes in python-pytest_example/ directory..."
-          git log
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^python-pytest_example/'; then
-            echo "run_tests=true" >> $GITHUB_OUTPUT
-            echo "Changes detected in python-pytest_example/ directory."
-          else
-            echo "run_tests=false" >> $GITHUB_OUTPUT
-            echo "No changes detected in python-pytest_example/ directory -> skipping tests."
-          fi
-
+  # JOB to tests execution
   run-tests:
-    if: needs.check-folder-changes.outputs.run_tests == 'true'
-
+    if: ${{ needs.check-folder-changes.outputs.python-pytest_example == 'true' }}
     needs: check-folder-changes
-
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           cache: "pip"
           python-version: ${{ matrix.python-version }}
-
       - name: Install/Upgrade Python package managers
         run: python -m pip install --upgrade pip setuptools wheel
-
       - name: Install dependencies
         run: python -m pip install -r python-pytest_example/requirements.txt
-
       - name: Execute the Pytest tests
         run: python -m pytest python-pytest_example -v
 
+  # JOB to check the results of the tests and decide the final result of the workflow
   check-test-results:
-    # Always run this job
     if: always()
-
     needs: [check-folder-changes, run-tests]
-
     runs-on: ubuntu-latest
-
     steps:
       - name: Decide final result
         run: |
-          if [ "${{ needs.check-folder-changes.outputs.run_tests }}" = "false" ]; then
+          if [ "${{ needs.check-folder-changes.outputs.python-pytest_example }}" = "false" ]; then
             echo "Tests were not required. Skipping final result check."
             exit 0
           fi
