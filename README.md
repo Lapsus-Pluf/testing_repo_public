@@ -8,3 +8,4 @@
 4. Repository has GitHub Actions:  
     4.1. Pytest tests (from *python-pytest_example*) are executed as a GitHub Action.  
         4.1.1. It **CANNOT** be merged a PR if any of the Pytest tests executions fail.  
+        4.1.2. The action is **ONLY** executed if any of the changed files is from the *python-pytest_example* folder.  

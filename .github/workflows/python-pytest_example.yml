@@ -6,8 +6,12 @@ name: Execute Python (Pytest) tests
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "python-pytest_example/**"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - "python-pytest_example/**"
 
 jobs:
   run-tests:
