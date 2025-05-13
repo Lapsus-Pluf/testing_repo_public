@@ -1,20 +1,40 @@
-# This workflow will install Python dependencies and run tests with a variety of Python versions
+# This workflow will be triggered on every push and pull request to the `main` branch.
+#   But it will only install Python dependencies and run Pytest tests (using a variety of Python versions)
+#   if modifications are made to the `python-pytest_example` directory.
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Execute Python (Pytest) tests
+name: Conditional Python (Pytest) tests execution
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - "python-pytest_example/**"
   pull_request:
     branches: [ "main" ]
-    paths:
-      - "python-pytest_example/**"
 
 jobs:
+  check-folder-changes:
+    outputs:
+      run_tests: ${{ steps.check_changes.outputs.run_tests }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - id: check_changes
+        name: Check for changes in python-pytest_example directory
+        run: |
+          echo "Checking for changes in python-pytest_example/ directory..."
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^python-pytest_example/'; then
+            echo "run_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "run_tests=false" >> $GITHUB_OUTPUT
+          fi
+
   run-tests:
+    if: needs.check-folder-changes.outputs.run_tests == 'true'
+
+    needs: check-folder-changes
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -40,3 +60,24 @@ jobs:
 
       - name: Execute the Pytest tests
         run: python -m pytest python-pytest_example -v
+
+  check-test-results:
+    # Always run this job
+    if: always()
+
+    needs: [check-folder-changes, run-tests]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Decide final result
+        run: |
+          if [ "${{ needs.check-folder-changes.outputs.run_tests }}" = "false" ]; then
+            echo "Tests were not required. Skipping final result check."
+            exit 0
+          fi
+          if [ "${{ needs.run-tests.result }}" != "success" ]; then
+            echo "Some tests failed."
+            exit 1
+          fi
+          echo "All tests passed."
