@@ -5,3 +5,5 @@ Tutorial URL: https://www.w3schools.com/django/index.php
     python -m venv venv
 4. Activate virtual environment
     source venv/bin/activate
+5. Install Django (inside venv)
+    python -m pip install Django
