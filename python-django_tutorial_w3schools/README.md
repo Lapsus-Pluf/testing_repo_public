@@ -14,3 +14,5 @@ Tutorial URL: https://www.w3schools.com/django/index.php
     python manage.py runserver
 8. Create an app
     python manage.py startapp members
+9. Migrate changes
+    python manage.py migrate
