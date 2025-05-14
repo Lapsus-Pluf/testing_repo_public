@@ -12,3 +12,5 @@ Tutorial URL: https://www.w3schools.com/django/index.php
 7. Run the Django project
     cd my_tennis_club
     python manage.py runserver
+8. Create an app
+    python manage.py startapp members
