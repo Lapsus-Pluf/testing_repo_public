@@ -40,3 +40,5 @@ Tutorial URL: https://www.w3schools.com/django/index.php
     2. Update and save the item
         x.firstname = "Stalikken"
         x.save()
+14. Delete a record
+    x.delete()
