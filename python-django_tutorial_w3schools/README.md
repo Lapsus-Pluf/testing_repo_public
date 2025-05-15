@@ -17,7 +17,7 @@ Tutorial URL: https://www.w3schools.com/django/index.php
     python manage.py runserver
 8. Create an app
     python manage.py startapp members
-9. Migrate changes
+9. Migrate changes and tell Django an update has ocurred. / Updates database schema. Manages both apps with migrations and those without.
     python manage.py migrate
 10. Create the model (table) in the database. / Creates new migration(s) for apps.
     python manage.py makemigrations members
