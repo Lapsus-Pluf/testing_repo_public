@@ -4,7 +4,10 @@ Tutorial URL: https://www.w3schools.com/django/index.php
 3. Create virtual environment
     python -m venv venv
 4. Activate virtual environment
-    source venv/bin/activate
+    Unix/MacOS
+        source venv/bin/activate
+    Windows
+        venv\Scripts\activate
 5. Install Django (inside venv)
     python -m pip install Django
 6. Create project
