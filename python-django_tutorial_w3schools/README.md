@@ -23,3 +23,14 @@ Tutorial URL: https://www.w3schools.com/django/index.php
     python manage.py makemigrations members
 11. View the executed SQL command during migration. / Prints the SQL statements for the named migration.
     python manage.py sqlmigrate members 0001
+12. Add records to the (now empty) table
+    1. Open a Python shell
+        python manage.py shell
+    2. Import the model
+        from members.models import Member
+    3. Check model table
+        Member.objects.all()
+        Member.objects.all().values()
+    4. Aggregate a member
+        member = Member(firstname='Emil', lastname='Refsnes')
+        member.save()
