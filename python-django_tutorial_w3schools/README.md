@@ -19,3 +19,7 @@ Tutorial URL: https://www.w3schools.com/django/index.php
     python manage.py startapp members
 9. Migrate changes
     python manage.py migrate
+10. Create the model (table) in the database. / Creates new migration(s) for apps.
+    python manage.py makemigrations members
+11. View the executed SQL command during migration. / Prints the SQL statements for the named migration.
+    python manage.py sqlmigrate members 0001
