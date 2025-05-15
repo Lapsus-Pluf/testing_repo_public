@@ -34,3 +34,9 @@ Tutorial URL: https://www.w3schools.com/django/index.php
     4. Aggregate a member
         member = Member(firstname='Emil', lastname='Refsnes')
         member.save()
+13. Update a record
+    1. Get an item
+        x = Member.objects.all()[4]
+    2. Update and save the item
+        x.firstname = "Stalikken"
+        x.save()
