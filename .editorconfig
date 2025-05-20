@@ -1,0 +1,26 @@
+# EditorConfig is awesome: https://editorconfig.org
+
+# Set that this is the top-most EditorConfig file
+root = true
+
+# Define (for every file) to be as default:
+# - UTF-8 charset
+# - Unix-style line endings
+# - 4 spaces as indentation
+# - A newline ending
+# - Trailing whitespace trimmed
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Specific files configuration
+[.prettierrc]
+indent_size = 2
+[*.json]
+indent_size = 2
+[*.md]
+trim_trailing_whitespace = false
